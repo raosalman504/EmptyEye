@@ -189,9 +189,3 @@ For issues and questions:
 - Check the troubleshooting section
 - Review error logs in the console
 - Ensure all dependencies are properly installed
-
----
-
-**Save Energy, Save Money, Save the Planet!**
-
-*EmptyEye helps you monitor and reduce unnecessary electricity consumption through intelligent automation.*
