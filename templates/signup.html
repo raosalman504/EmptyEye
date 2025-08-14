@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up - Empty Eye</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .password-requirements {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        .requirement {
+            margin: 3px 0;
+        }
+        .valid {
+            color: green;
+        }
+        .invalid {
+            color: red;
+        }
+        .hidden {
+            display: none;
+        }
+        .input-feedback {
+            font-size: 0.8em;
+            margin-top: 2px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="/static/logo.svg" alt="Empty Eye Logo" class="logo">
+        </div>
+        <h2>Create Account</h2>
+        {% if error %}<p class="error"><i class="fas fa-exclamation-circle"></i> {{ error }}</p>{% endif %}
+        <form method="POST" id="signupForm">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="username" id="username" placeholder="Username" required minlength="3">
+                <div id="usernameMessage" class="input-feedback hidden"></div>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" id="email" placeholder="Email" required>
+                <div id="emailMessage" class="input-feedback hidden"></div>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" id="password" placeholder="Password" required>
+            </div>
+            <div class="password-requirements" id="passwordRequirements">
+                <div class="requirement" id="length">• Minimum 8 characters</div>
+                <div class="requirement" id="uppercase">• At least one uppercase letter</div>
+                <div class="requirement" id="lowercase">• At least one lowercase letter</div>
+                <div class="requirement" id="number">• At least one number</div>
+            </div>
+            <button type="submit" id="submitBtn">Sign Up <i class="fas fa-user-plus"></i></button>
+        </form>
+        <p>Already have an account? <a href="/login">Login</a></p>
+    </div>
+    <footer>
+        <p>&copy; 2025 Empty Eye - Energy Conservation System</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const emailInput = document.getElementById('email');
+            const usernameInput = document.getElementById('username');
+            const submitBtn = document.getElementById('submitBtn');
+            const emailMessage = document.getElementById('emailMessage');
+            const usernameMessage = document.getElementById('usernameMessage');
+            
+            // Password validation
+            passwordInput.addEventListener('input', validatePassword);
+            
+            function validatePassword() {
+                const password = passwordInput.value;
+                
+                // Length validation
+                const lengthReq = document.getElementById('length');
+                if (password.length >= 8) {
+                    lengthReq.classList.add('valid');
+                    lengthReq.classList.remove('invalid');
+                } else {
+                    lengthReq.classList.add('invalid');
+                    lengthReq.classList.remove('valid');
+                }
+                
+                // Uppercase validation
+                const uppercaseReq = document.getElementById('uppercase');
+                if (/[A-Z]/.test(password)) {
+                    uppercaseReq.classList.add('valid');
+                    uppercaseReq.classList.remove('invalid');
+                } else {
+                    uppercaseReq.classList.add('invalid');
+                    uppercaseReq.classList.remove('valid');
+                }
+                
+                // Lowercase validation
+                const lowercaseReq = document.getElementById('lowercase');
+                if (/[a-z]/.test(password)) {
+                    lowercaseReq.classList.add('valid');
+                    lowercaseReq.classList.remove('invalid');
+                } else {
+                    lowercaseReq.classList.add('invalid');
+                    lowercaseReq.classList.remove('valid');
+                }
+                
+                // Number validation
+                const numberReq = document.getElementById('number');
+                if (/[0-9]/.test(password)) {
+                    numberReq.classList.add('valid');
+                    numberReq.classList.remove('invalid');
+                } else {
+                    numberReq.classList.add('invalid');
+                    numberReq.classList.remove('valid');
+                }
+            }
+            
+            // Email validation
+            emailInput.addEventListener('input', function() {
+                const email = emailInput.value;
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                
+                if (email && !emailRegex.test(email)) {
+                    emailMessage.textContent = 'Please enter a valid email address';
+                    emailMessage.classList.remove('hidden');
+                    emailMessage.style.color = 'red';
+                } else {
+                    emailMessage.classList.add('hidden');
+                }
+            });
+            
+            // Form validation before submit
+            document.getElementById('signupForm').addEventListener('submit', function(event) {
+                const password = passwordInput.value;
+                const email = emailInput.value;
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                
+                let isValid = true;
+                
+                // Validate password
+                if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+                    isValid = false;
+                }
+                
+                // Validate email
+                if (!emailRegex.test(email)) {
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    event.preventDefault();
+                    alert('Please fix the errors in the form before submitting.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

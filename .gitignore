@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE settings
+.vscode/
+.idea/
+
+# Environment variables
+.env
+.env.*
+
+# Large ML model weights
+*.pt
+models/**/weights/
+models/**/best.*
+
+# Cache
+*.cache/
+.cache/
+
+# Flask session keys (if any)
+instance/
+
+# Node/build (if ever used)
+node_modules/
+dist/
+build/

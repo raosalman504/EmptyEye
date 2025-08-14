@@ -1,0 +1,9 @@
+flask
+flask-socketio
+mysql-connector-python
+opencv-python
+ultralytics
+dnspython
+secure-smtplib
+email-validator
+itsdangerous

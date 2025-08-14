@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home - Empty Eye</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="dashboard-body"> 
+    <div class="navbar">
+        <div class="navbar-brand">
+            <img src="/static/logo.svg" alt="Empty Eye Logo" class="nav-logo">
+            <span>Empty Eye</span>
+        </div>
+        <div class="user-info">
+            <a href="/about"><i class="fas fa-info-circle"></i> About</a>
+            <span><i class="fas fa-user-circle"></i> {{ session['username'] }}</span>
+            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+    
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-video"></i> Energy Monitoring System</h1>
+            <p>Detect and monitor energy usage in real-time</p>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-camera"></i> Live Detection</h2>
+                </div>
+                <div class="card-body" id="live-feed">
+                    <div class="video-container">
+                        <img id="video-stream" src="/video_feed" alt="Live Camera Feed">
+                    </div>
+                    <div class="detection-status">
+                        <div class="status-item">
+                            <i class="fas fa-snowflake"></i> <span>AC Status: <span id="ac-status">Checking...</span></span>
+                        </div>
+                        <div class="status-item">
+                            <i class="fas fa-fan"></i> <span>Fan Status: <span id="fan-status">Checking...</span></span>
+                        </div>
+                        <div class="status-item">
+                            <i class="fas fa-user"></i> <span>Human Present: <span id="human-status">Checking...</span></span>
+                        </div>
+                        <div class="status-item">
+                            <i class="fas fa-mobile-alt"></i> <span>Mobile Present: <span id="mobile-status">Checking...</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card notification-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-bell"></i> Notification History</h2>
+                    <button id="refresh-btn" onclick="loadNotificationHistory()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <div class="card-body">
+                    <div class="notification-container">
+                        <ul id="notification-list" class="animated-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Empty Eye - Energy Conservation System</p>
+    </footer>
+    
+    <script>
+      // Load notification history on page load
+      window.addEventListener('DOMContentLoaded', function() {
+        loadNotificationHistory();
+        updateDetectionStatus();
+        
+        // Refresh notifications every 30 seconds
+        setInterval(loadNotificationHistory, 30000);
+        
+        // Refresh detection status every 2 seconds
+        setInterval(updateDetectionStatus, 2000);
+      });
+      
+      function loadNotificationHistory() {
+        const notifList = document.getElementById('notification-list');
+        const refreshBtn = document.getElementById('refresh-btn');
+        
+        refreshBtn.classList.add('spinning');
+        
+        fetch('/notifications')
+          .then(res => res.json())
+          .then(data => {
+            console.log('Got notifications:', data);
+            notifList.innerHTML = '';
+            
+            if (data.length === 0) {
+              const li = document.createElement('li');
+              li.innerHTML = '<i class="fas fa-info-circle"></i> No notifications yet';
+              notifList.appendChild(li);
+            } else {
+              data.forEach(n => {
+                const li = document.createElement('li');
+                const date = new Date(n.timestamp);
+                const formattedDate = date.toLocaleString();
+                
+                let icon = 'bell';
+                if (n.message.includes('AC')) {
+                  icon = 'snowflake';
+                } else if (n.message.includes('Fan')) {
+                  icon = 'fan';
+                } else if (n.message.includes('Mobile')) {
+                  icon = 'mobile-alt';
+                }
+                
+                li.innerHTML = `<i class="fas fa-${icon}"></i> <strong>${n.message}</strong> <span class="notification-time">${formattedDate}</span>`;
+                notifList.appendChild(li);
+              });
+            }
+            
+            refreshBtn.classList.remove('spinning');
+          })
+          .catch(err => {
+            console.error('Error loading notifications:', err);
+            const li = document.createElement('li');
+            li.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error loading notifications';
+            li.classList.add('error-notification');
+            notifList.appendChild(li);
+            
+            refreshBtn.classList.remove('spinning');
+          });
+      }
+      
+      // Get real detection status from the backend
+      function updateDetectionStatus() {
+        const acStatus = document.getElementById('ac-status');
+        const fanStatus = document.getElementById('fan-status');
+        const humanStatus = document.getElementById('human-status');
+        const mobileStatus = document.getElementById('mobile-status');
+        
+        fetch('/detection_status')
+          .then(res => res.json())
+          .then(data => {
+            // Update AC status
+            acStatus.textContent = data.ac_status.toUpperCase();
+            acStatus.className = data.ac_status === 'on' ? 'status-on' : 'status-off';
+            
+            // Update Fan status
+            fanStatus.textContent = data.fan_status.toUpperCase();
+            fanStatus.className = data.fan_status === 'on' ? 'status-on' : 'status-off';
+            
+            // Update Human presence
+            humanStatus.textContent = data.human_present ? 'YES' : 'NO';
+            humanStatus.className = data.human_present ? 'status-on' : 'status-off';
+            
+            // Update Mobile presence
+            mobileStatus.textContent = data.mobile_present ? 'YES' : 'NO';
+            mobileStatus.className = data.mobile_present ? 'status-on' : 'status-off';
+          })
+          .catch(err => {
+            console.error('Error fetching detection status:', err);
+          });
+      }
+    </script>
+</body>
+</html>
